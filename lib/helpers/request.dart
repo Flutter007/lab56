@@ -2,7 +2,11 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-Future<void> request(String url, {String method = 'GET', dynamic body}) async {
+Future<dynamic> request(
+  String url, {
+  String method = 'GET',
+  dynamic body,
+}) async {
   final uri = Uri.parse(url);
   http.Response response;
   if (method == 'GET') {
