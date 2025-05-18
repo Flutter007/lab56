@@ -57,7 +57,11 @@ class _PostFormScreenState extends State<PostFormScreen> {
       body: Column(
         children: [
           Expanded(
-            child: CreationForm(controller: controller, createPost: createPost),
+            child: CreationForm(
+              controller: controller,
+              action: createPost,
+              buttonText: 'Create Post',
+            ),
           ),
         ],
       ),

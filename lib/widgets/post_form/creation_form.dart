@@ -5,12 +5,14 @@ import '../../provider/post_provider.dart';
 import 'creation_form_controller.dart';
 
 class CreationForm extends StatefulWidget {
+  final String buttonText;
   final CreationFormController controller;
-  final void Function() createPost;
+  final void Function() action;
   const CreationForm({
     super.key,
     required this.controller,
-    required this.createPost,
+    required this.action,
+    required this.buttonText,
   });
 
   @override
@@ -52,8 +54,8 @@ class _CreationFormState extends State<CreationForm> {
                   },
                 ),
                 ElevatedButton(
-                  onPressed: widget.createPost,
-                  child: Text('Create'),
+                  onPressed: widget.action,
+                  child: Text(widget.buttonText),
                 ),
               ],
             ),

@@ -20,31 +20,29 @@ class _SinglePostInfoScreenState extends State<SinglePostInfoScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<PostProvider>().post == null;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      id = ModalRoute.of(context)!.settings.arguments as String;
+      postProvider = context.read<PostProvider>();
+      await postProvider.getPost(id);
+      post = postProvider.post;
     });
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    id = ModalRoute.of(context)!.settings.arguments as String;
-    postProvider = context.read<PostProvider>();
-    postProvider.getPost(id);
-    post = postProvider.post;
-  }
-
-  @override
   void dispose() {
-    postProvider.post = null;
+    context.read<PostProvider>().clearPosts();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final postProvider = context.watch<PostProvider>();
-    return postProvider.post != null
+    return postProvider.isFetching
         ? Scaffold(
+          appBar: AppBar(title: Text('Loading...')),
+          body: Center(child: CircularProgressIndicator()),
+        )
+        : Scaffold(
           appBar: AppBar(title: Text(post!.header)),
           body: Column(
             children: [
@@ -52,10 +50,6 @@ class _SinglePostInfoScreenState extends State<SinglePostInfoScreen> {
               Text(dateTime.format(post!.createdAt)),
             ],
           ),
-        )
-        : Scaffold(
-          appBar: AppBar(title: Text('Loading...')),
-          body: Center(child: CircularProgressIndicator()),
         );
   }
 }

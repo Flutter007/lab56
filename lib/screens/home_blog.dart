@@ -27,6 +27,10 @@ class _HomeBlogState extends State<HomeBlog> {
     Navigator.of(context).pushNamed(AppRoutes.create);
   }
 
+  void goToEditForm() {
+    Navigator.of(context).pushNamed(AppRoutes.edit);
+  }
+
   void goToPostInfo(String id) {
     Navigator.of(context).pushNamed(AppRoutes.singlePost, arguments: id);
   }
@@ -37,11 +41,32 @@ class _HomeBlogState extends State<HomeBlog> {
     postProvider = context.read<PostProvider>();
   }
 
+  void deletePost(String id) async {
+    try {
+      await postProvider.deletePost(id);
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Post deleted!')));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Something went wrong!')));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final postProvider = context.watch<PostProvider>();
+    bool isLoading =
+        postProvider.isFetching ||
+        postProvider.isCreating ||
+        postProvider.isDeleting;
     Widget body;
-    if (postProvider.isFetching || postProvider.isCreating) {
+    if (isLoading) {
       body = Center(child: CircularProgressIndicator());
     } else if (postProvider.isError) {
       body = Center(child: Text('Error'));
@@ -57,7 +82,8 @@ class _HomeBlogState extends State<HomeBlog> {
                     (ctx, i) => PostCard(
                       post: postProvider.posts[i],
                       onTap: () => goToPostInfo(postProvider.posts[i].id!),
-                      onLongPress: goToPostForm,
+                      onLongPress: goToEditForm,
+                      deletePost: () => deletePost(postProvider.posts[i].id!),
                     ),
                 itemCount: postProvider.posts.length,
               ),

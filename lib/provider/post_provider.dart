@@ -5,14 +5,15 @@ import 'package:lab56/models/post.dart';
 class PostProvider extends ChangeNotifier {
   List<Post> _posts = [];
   Post? post;
-
   bool _isFetching = false;
   bool _isError = false;
   bool _isCreating = false;
+  bool _isDeleting = false;
   List<Post> get posts => [..._posts];
   bool get isFetching => _isFetching;
   bool get isError => _isError;
   bool get isCreating => _isCreating;
+  bool get isDeleting => _isDeleting;
 
   void clearPosts() {
     post = null;
@@ -69,6 +70,20 @@ class PostProvider extends ChangeNotifier {
       post = Post.fromJson({...response, 'id': id});
     } finally {
       _isFetching = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> deletePost(String id) async {
+    try {
+      _isDeleting = true;
+      notifyListeners();
+      final url =
+          'https://my-db-7777-default-rtdb.europe-west1.firebasedatabase.app/blog/$id.json';
+      await request(url, method: 'DELETE');
+    } finally {
+      _isDeleting = false;
+      await fetchPosts();
       notifyListeners();
     }
   }
