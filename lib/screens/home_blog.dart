@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:lab56/provider/post_provider.dart';
 import 'package:lab56/widgets/post_card.dart';
 import 'package:provider/provider.dart';
-
 import '../app_routes.dart';
 
 class HomeBlog extends StatefulWidget {
@@ -27,8 +26,8 @@ class _HomeBlogState extends State<HomeBlog> {
     Navigator.of(context).pushNamed(AppRoutes.create);
   }
 
-  void goToEditForm() {
-    Navigator.of(context).pushNamed(AppRoutes.edit);
+  void goToEditForm(String id) {
+    Navigator.of(context).pushNamed(AppRoutes.edit, arguments: id);
   }
 
   void goToPostInfo(String id) {
@@ -61,17 +60,20 @@ class _HomeBlogState extends State<HomeBlog> {
   @override
   Widget build(BuildContext context) {
     final postProvider = context.watch<PostProvider>();
+    final bodyLarge = Theme.of(context).textTheme.displaySmall;
     bool isLoading =
         postProvider.isFetching ||
         postProvider.isCreating ||
         postProvider.isDeleting;
+
     Widget body;
+
     if (isLoading) {
       body = Center(child: CircularProgressIndicator());
     } else if (postProvider.isError) {
       body = Center(child: Text('Error'));
     } else if (postProvider.posts.isEmpty) {
-      body = Center(child: Text('No posts'));
+      body = Center(child: Text('No posts', style: bodyLarge));
     } else {
       body = Center(
         child: Column(
@@ -82,7 +84,8 @@ class _HomeBlogState extends State<HomeBlog> {
                     (ctx, i) => PostCard(
                       post: postProvider.posts[i],
                       onTap: () => goToPostInfo(postProvider.posts[i].id!),
-                      onLongPress: goToEditForm,
+                      onLongPress:
+                          () => goToEditForm(postProvider.posts[i].id!),
                       deletePost: () => deletePost(postProvider.posts[i].id!),
                     ),
                 itemCount: postProvider.posts.length,

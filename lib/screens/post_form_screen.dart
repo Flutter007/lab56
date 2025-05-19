@@ -16,10 +16,11 @@ class PostFormScreen extends StatefulWidget {
 class _PostFormScreenState extends State<PostFormScreen> {
   final controller = CreationFormController();
   late PostProvider postProvider;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    postProvider = context.watch<PostProvider>();
+    postProvider = context.read<PostProvider>();
   }
 
   void sentPost() async {
@@ -29,7 +30,9 @@ class _PostFormScreenState extends State<PostFormScreen> {
         body: controller.bodyController.text,
         createdAt: DateTime.now(),
       );
-      await postProvider.createPost(post);
+      await postProvider.createPost(post, 'POST');
+      await Future.delayed(Duration(milliseconds: 70));
+      clearInfo();
       if (mounted) {
         ScaffoldMessenger.of(
           context,
@@ -48,6 +51,11 @@ class _PostFormScreenState extends State<PostFormScreen> {
     if (controller.formKey.currentState!.validate()) {
       sentPost();
     }
+  }
+
+  void clearInfo() {
+    controller.headerController.clear();
+    controller.bodyController.clear();
   }
 
   @override

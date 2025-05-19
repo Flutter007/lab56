@@ -15,19 +15,19 @@ class PostProvider extends ChangeNotifier {
   bool get isCreating => _isCreating;
   bool get isDeleting => _isDeleting;
 
-  void clearPosts() {
-    post = null;
-    notifyListeners();
-  }
+  final url =
+      'https://my-db-7777-default-rtdb.europe-west1.firebasedatabase.app/';
 
   Future<void> fetchPosts() async {
     try {
       _isFetching = true;
       _isError = false;
       notifyListeners();
-      final url =
-          'https://my-db-7777-default-rtdb.europe-west1.firebasedatabase.app/blog.json';
-      final Map<String, dynamic>? response = await request(url, method: 'GET');
+
+      final Map<String, dynamic>? response = await request(
+        '$url/blog.json',
+        method: 'GET',
+      );
       if (response == null) {
         _posts = [];
         return;
@@ -46,13 +46,21 @@ class PostProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> createPost(Post post) async {
+  Future<void> createPost(Post post, String method) async {
     try {
       _isCreating = true;
       notifyListeners();
-      final url =
-          'https://my-db-7777-default-rtdb.europe-west1.firebasedatabase.app/blog.json';
-      await request(url, method: 'POST', body: post.toJson());
+      if (method == 'POST') {
+        await request('$url/blog.json', method: 'POST', body: post.toJson());
+      } else if (method == 'PUT') {
+        await request(
+          '$url/blog/${post.id}.json',
+          method: 'PUT',
+          body: post.toJson(),
+        );
+      } else {
+        throw Exception('Method not supported');
+      }
     } finally {
       _isCreating = false;
       await fetchPosts();
@@ -64,9 +72,7 @@ class PostProvider extends ChangeNotifier {
     try {
       _isFetching = true;
       notifyListeners();
-      final url =
-          'https://my-db-7777-default-rtdb.europe-west1.firebasedatabase.app/blog/$id.json';
-      final Map<String, dynamic> response = await request(url);
+      final Map<String, dynamic> response = await request('$url/blog/$id.json');
       post = Post.fromJson({...response, 'id': id});
     } finally {
       _isFetching = false;
@@ -78,9 +84,7 @@ class PostProvider extends ChangeNotifier {
     try {
       _isDeleting = true;
       notifyListeners();
-      final url =
-          'https://my-db-7777-default-rtdb.europe-west1.firebasedatabase.app/blog/$id.json';
-      await request(url, method: 'DELETE');
+      await request('$url/blog/$id.json', method: 'DELETE');
     } finally {
       _isDeleting = false;
       await fetchPosts();

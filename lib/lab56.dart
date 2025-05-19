@@ -7,14 +7,18 @@ import 'package:lab56/screens/post_form_screen.dart';
 import 'package:lab56/screens/single_post_info_screen.dart';
 import 'package:provider/provider.dart';
 
+import 'theme/light_theme.dart';
+
 class Lab56 extends StatelessWidget {
   const Lab56({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [ChangeNotifierProvider(create: (ctx) => PostProvider())],
+    return ChangeNotifierProvider(
+      create: (ctx) => PostProvider(),
       child: MaterialApp(
+        themeMode: ThemeMode.system,
+        theme: lightTheme,
         initialRoute: AppRoutes.home,
         routes: {
           AppRoutes.home: (ctx) => HomeBlog(),

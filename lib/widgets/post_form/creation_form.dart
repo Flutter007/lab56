@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../provider/post_provider.dart';
+import '../custom_text_form_field.dart';
 import 'creation_form_controller.dart';
 
 class CreationForm extends StatefulWidget {
   final String buttonText;
   final CreationFormController controller;
   final void Function() action;
+
   const CreationForm({
     super.key,
     required this.controller,
@@ -31,23 +32,21 @@ class _CreationFormState extends State<CreationForm> {
             key: widget.controller.formKey,
             child: Column(
               children: [
-                TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'Enter Header of Post',
-                  ),
+                CustomTextFormField(
+                  labelText: 'Enter Header',
                   controller: widget.controller.headerController,
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
+                    if (value == null || value.isEmpty || value.length < 3) {
                       return 'Please enter a header';
                     }
                     return null;
                   },
                 ),
-                TextFormField(
-                  decoration: InputDecoration(labelText: 'Enter your post'),
+                CustomTextFormField(
+                  labelText: 'Enter Post',
                   controller: widget.controller.bodyController,
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
+                    if (value == null || value.isEmpty || value.length < 3) {
                       return 'Please enter a post';
                     }
                     return null;
